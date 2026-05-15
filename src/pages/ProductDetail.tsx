@@ -1,9 +1,13 @@
 import { useQuery } from "@tanstack/react-query"
 import { useParams } from "react-router-dom"
 import { getProductBySlugApi } from "../api/product.api"
+import { useCartStore } from "../store/cartStore"
+import { useNavigate } from "react-router-dom"
 
 const ProductDetail = () => {
     const { slug } = useParams()
+    const { addItem } = useCartStore()
+    const navigate = useNavigate()
 
     const { data, isLoading, isError } = useQuery({
         queryKey: ["product", slug],
@@ -22,6 +26,12 @@ const ProductDetail = () => {
             <p>{product?.description}</p>
             <p>Brand: {product?.brand}</p>
             <p>Stock: {product?.stock}</p>
+            <button onClick={() => {
+                addItem(product)
+                navigate("/cart")
+            }}>
+                Savatga qo'shish
+            </button>
         </div>
     )
 }
