@@ -13,7 +13,7 @@ export const getProductsApi = async (params?: {
 }
 
 export const getProductBySlugApi = async (slug: string) => {
-    const response = await api.get(`/products/${slug}`)
+    const response = await api.get(`/products/slug/${slug}`)
     return response.data
 }
 
