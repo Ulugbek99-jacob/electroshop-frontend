@@ -7,4 +7,9 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  preview: {
+    allowedHosts: ['electroshop-frontend-production.up.railway.app'],
+    port: 4173,
+    host: true
+  }
 })
