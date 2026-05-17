@@ -15,6 +15,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard"
 import AdminProducts from "./pages/admin/AdminProducts"
 import AdminOrders from "./pages/admin/AdminOrders"
 import AdminProductCreate from "./pages/admin/AdminProductCreate"
+import AdminProductEdit from "./pages/admin/AdminProductEdit"
 
 
 const queryClient = new QueryClient()
@@ -34,6 +35,11 @@ function App() {
                     <Route path="/checkout" element= {<Checkout />} />
                     <Route path="/orders" element={<Orders />} />
                     <Route path="/profile" element= {<Profile />} />
+                    <Route path="/admin/products/edit/:id" element={
+    <ProtectedRoute adminOnly>
+        <AdminProductEdit />
+    </ProtectedRoute>
+} />
                     <Route path="/admin/products/create" element={
                     <ProtectedRoute adminOnly>
                     <AdminProductCreate />
@@ -54,6 +60,7 @@ function App() {
             </BrowserRouter>
         </QueryClientProvider>
     )
+    
 }
 
 export default App

@@ -26,18 +26,20 @@ const AdminProducts = () => {
                 Add Product
             </button>
             {data?.data.map((product: any) => (
-                <div key={product._id}>
-                    <h3>{product.name}</h3>
-                    <p>{product.price} $</p>
-                    <p>Stock: {product.stock}</p>
-                    <button onClick={() => navigate(`/admin/products/edit/${product._id}`)}>
-                        Edit
-                    </button>
-                    <button onClick={() => handleDelete(product._id)}>
-                        Delete
-                    </button>
-                </div>
-            ))}
+    <div key={product._id}>
+        {product.images?.[0] && <img src={product.images[0]} width={80} alt={product.name} />}
+        <h3>{product.name}</h3>
+        <p>{product.price} $</p>
+        <p>Stock: {product.stock}</p>
+        <button onClick={() => navigate(`/admin/products/edit/${product._id}`)}>
+            Edit
+        </button>
+        <button onClick={() => handleDelete(product._id)}>
+            Delete
+        </button>
+    </div>
+))}
+            
         </div>
     )
 }
