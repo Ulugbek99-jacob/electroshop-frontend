@@ -10,6 +10,12 @@ import Checkout from "./pages/Checkout"
 import Navbar from "./components/Navbar"
 import Profile from "./pages/Profile"
 import Orders from "./pages/Orders"
+import ProtectedRoute from "./components/ProtectedRoute"
+import AdminDashboard from "./pages/admin/AdminDashboard"
+import AdminProducts from "./pages/admin/AdminProducts"
+import AdminOrders from "./pages/admin/AdminOrders"
+import AdminProductCreate from "./pages/admin/AdminProductCreate"
+
 
 const queryClient = new QueryClient()
 
@@ -28,6 +34,22 @@ function App() {
                     <Route path="/checkout" element= {<Checkout />} />
                     <Route path="/orders" element={<Orders />} />
                     <Route path="/profile" element= {<Profile />} />
+                    <Route path="/admin/products/create" element={
+                    <ProtectedRoute adminOnly>
+                    <AdminProductCreate />
+                    </ProtectedRoute>
+                      } />
+                    <Route path="/admin" element={<ProtectedRoute adminOnly> <AdminDashboard /> </ProtectedRoute>} />
+<Route path="/admin/products" element={
+    <ProtectedRoute adminOnly>
+        <AdminProducts />
+    </ProtectedRoute>
+} />
+<Route path="/admin/orders" element={
+    <ProtectedRoute adminOnly>
+        <AdminOrders />
+    </ProtectedRoute>
+} />
                 </Routes>
             </BrowserRouter>
         </QueryClientProvider>
