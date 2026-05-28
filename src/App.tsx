@@ -17,6 +17,7 @@ import AdminOrders from "./pages/admin/AdminOrders"
 import AdminProductCreate from "./pages/admin/AdminProductCreate"
 import AdminProductEdit from "./pages/admin/AdminProductEdit"
 import AdminCategories from "./pages/admin/AdminCategories"
+import ChatBot from "./components/ChatBot"
 
 
 const queryClient = new QueryClient()
@@ -26,6 +27,7 @@ function App() {
         <QueryClientProvider client={queryClient}>
             <BrowserRouter>
             <Navbar />
+            <ChatBot />
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />
