@@ -2,29 +2,40 @@ import { useState, useEffect } from "react"
 import api from "../../api/axios"
 import { useNavigate, useParams } from "react-router-dom"
 
+const inputStyle: React.CSSProperties = {
+    width: '100%',
+    padding: '10px 14px',
+    borderRadius: '8px',
+    border: '1px solid var(--border)',
+    background: 'var(--bg)',
+    fontSize: '14px',
+    color: 'var(--text-primary)',
+    outline: 'none',
+    fontFamily: 'Inter, sans-serif',
+}
+
+const labelStyle: React.CSSProperties = {
+    display: 'block',
+    fontSize: '11px',
+    fontWeight: 600,
+    color: 'var(--text-secondary)',
+    marginBottom: '6px',
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase',
+}
+
 const AdminProductEdit = () => {
     const { id } = useParams()
     const navigate = useNavigate()
     const [imageUrl, setImageUrl] = useState("")
     const [uploading, setUploading] = useState(false)
-    const [form, setForm] = useState({
-        name: "",
-        description: "",
-        price: 0,
-        stock: 0,
-        brand: "",
-    })
+    const [loading, setLoading] = useState(false)
+    const [form, setForm] = useState({ name: "", description: "", price: 0, stock: 0, brand: "" })
 
     useEffect(() => {
         api.get(`/products/${id}`).then(res => {
             const p = res.data.data
-            setForm({
-                name: p.name,
-                description: p.description,
-                price: p.price,
-                stock: p.stock,
-                brand: p.brand,
-            })
+            setForm({ name: p.name, description: p.description, price: p.price, stock: p.stock, brand: p.brand })
             setImageUrl(p.images?.[0] || "")
         })
     }, [id])
@@ -39,51 +50,89 @@ const AdminProductEdit = () => {
         setUploading(true)
         const formData = new FormData()
         formData.append("image", file)
-        const response = await api.post("/uploads", formData, {
-            headers: { "Content-Type": "multipart/form-data" }
-        })
+        const response = await api.post("/uploads", formData, { headers: { "Content-Type": "multipart/form-data" } })
         setImageUrl(response.data.url)
         setUploading(false)
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+        setLoading(true)
         try {
-            await api.put(`/products/${id}`, {
-                ...form,
-                price: Number(form.price),
-                stock: Number(form.stock),
-                images: [imageUrl]
-            })
+            await api.put(`/products/${id}`, { ...form, price: Number(form.price), stock: Number(form.stock), images: [imageUrl] })
             navigate("/admin/products")
-        } catch (error) {
+        } catch {
             alert("Error occurred")
+        } finally {
+            setLoading(false)
         }
     }
 
     return (
-        <div className="min-h-screen bg-gray-100">
-            <div className="max-w-2xl mx-auto px-4 py-8">
-                <h1 className="text-3xl font-bold text-gray-800 mb-6">Edit Product</h1>
-                <div className="bg-white rounded-lg shadow p-6">
-                    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                        <input name="name" value={form.name} placeholder="Name" onChange={handleChange}
-                            className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-blue-500" />
-                        <textarea name="description" value={form.description} placeholder="Description" onChange={handleChange}
-                            className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-blue-500 h-24" />
-                        <input name="price" type="number" value={form.price} placeholder="Price" onChange={handleChange}
-                            className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-blue-500" />
-                        <input name="stock" type="number" value={form.stock} placeholder="Stock" onChange={handleChange}
-                            className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-blue-500" />
-                        <input name="brand" value={form.brand} placeholder="Brand" onChange={handleChange}
-                            className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-blue-500" />
-                        <input type="file" accept="image/*" onChange={handleImageUpload}
-                            className="border border-gray-300 rounded px-4 py-2" />
-                        {uploading && <p className="text-blue-500">Uploading...</p>}
-                        {imageUrl !== "" && <img src={imageUrl} alt="preview" className="w-32 h-32 object-cover rounded" />}
-                        <button type="submit"
-                            className="bg-yellow-400 hover:bg-yellow-500 text-white py-2 rounded font-semibold">
-                            Update
+        <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
+            <div style={{ maxWidth: '640px', margin: '0 auto', padding: '48px 24px' }}>
+                <div style={{ marginBottom: '32px' }}>
+                    <button onClick={() => navigate('/admin/products')} style={{ background: 'none', border: 'none', color: 'var(--text-tertiary)', cursor: 'pointer', fontSize: '13px', padding: 0, marginBottom: '8px' }}>
+                        ← Back to products
+                    </button>
+                    <h1 style={{ fontSize: '28px', fontWeight: 800, letterSpacing: '-0.03em' }}>Edit Product</h1>
+                </div>
+
+                <div style={{ background: 'var(--surface)', borderRadius: '20px', border: '1px solid var(--border)', padding: '28px' }}>
+                    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                        {[
+                            { name: 'name', label: 'Name', type: 'text' },
+                            { name: 'brand', label: 'Brand', type: 'text' },
+                            { name: 'price', label: 'Price ($)', type: 'number' },
+                            { name: 'stock', label: 'Stock', type: 'number' },
+                        ].map(field => (
+                            <div key={field.name}>
+                                <label style={labelStyle}>{field.label}</label>
+                                <input
+                                    name={field.name}
+                                    type={field.type}
+                                    value={(form as any)[field.name]}
+                                    onChange={handleChange}
+                                    style={inputStyle}
+                                    onFocus={e => e.target.style.borderColor = 'var(--blue)'}
+                                    onBlur={e => e.target.style.borderColor = 'var(--border)'}
+                                />
+                            </div>
+                        ))}
+
+                        <div>
+                            <label style={labelStyle}>Description</label>
+                            <textarea
+                                name="description"
+                                value={form.description}
+                                onChange={handleChange}
+                                rows={4}
+                                style={{ ...inputStyle, resize: 'vertical' }}
+                                onFocus={e => e.target.style.borderColor = 'var(--blue)'}
+                                onBlur={e => e.target.style.borderColor = 'var(--border)'}
+                            />
+                        </div>
+
+                        <div>
+                            <label style={labelStyle}>Image</label>
+                            {imageUrl && (
+                                <img src={imageUrl} alt="current" style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '10px', marginBottom: '10px', border: '1px solid var(--border)' }} />
+                            )}
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                                style={{ ...inputStyle, cursor: 'pointer' }}
+                            />
+                            {uploading && <p style={{ fontSize: '12px', color: 'var(--blue)', marginTop: '6px' }}>Uploading...</p>}
+                        </div>
+
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            style={{ padding: '12px', borderRadius: '10px', background: 'var(--accent)', color: '#fff', border: 'none', fontSize: '14px', fontWeight: 600, cursor: 'pointer', opacity: loading ? 0.7 : 1 }}
+                        >
+                            {loading ? 'Saving...' : 'Save changes'}
                         </button>
                     </form>
                 </div>

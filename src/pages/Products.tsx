@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { getProductsApi } from "../api/product.api"
 import { useNavigate } from "react-router-dom"
+import { ProductCard } from "./Home"
 
 const Products = () => {
     const { data, isLoading, isError } = useQuery({
@@ -9,31 +10,61 @@ const Products = () => {
     })
     const navigate = useNavigate()
 
-    if (isLoading) return <p className="text-center mt-10">Loading...</p>
-    if (isError) return <p className="text-center mt-10 text-red-500">Something went wrong</p>
-
     return (
-        <div className="min-h-screen bg-gray-100">
-            <div className="max-w-6xl mx-auto px-4 py-8">
-                <h1 className="text-3xl font-bold text-gray-800 mb-6">Products</h1>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {data?.data.map((product: any) => (
-                        <div key={product._id} className="bg-white rounded-lg shadow p-4">
-                            {product.images?.[0] && (
-                                <img src={product.images[0]} alt={product.name} className="w-full h-48 object-cover rounded mb-3" />
-                            )}
-                            <h3 className="font-semibold text-lg">{product.name}</h3>
-                            <p className="text-blue-600 font-bold">{product.price} $</p>
-                            <p className="text-gray-500 text-sm">Brand: {product.brand}</p>
-                            <button
-                                onClick={() => navigate(`/products/${product.slug}`)}
-                                className="mt-3 w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded"
-                            >
-                                View
-                            </button>
-                        </div>
-                    ))}
+        <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
+            <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '48px 24px' }}>
+                <div style={{ marginBottom: '32px' }}>
+                    <h1 style={{ fontSize: '32px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--text-primary)', marginBottom: '8px' }}>
+                        All Products
+                    </h1>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
+                        {data?.data?.length || 0} items
+                    </p>
                 </div>
+
+                {isLoading && (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
+                        {[1,2,3,4,5,6].map(i => (
+                            <div key={i} style={{ height: '320px', borderRadius: '16px', background: 'var(--border)' }} />
+                        ))}
+                    </div>
+                )}
+
+                {isError && (
+                    <div style={{ textAlign: 'center', padding: '80px 0', color: 'var(--text-secondary)' }}>
+                        <p style={{ fontSize: '32px', marginBottom: '12px' }}>⚠️</p>
+                        <p>Something went wrong. Please try again.</p>
+                    </div>
+                )}
+
+                {!isLoading && !isError && (
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+                        gap: '16px',
+                    }}>
+                        {data?.data.map((product: any) => (
+                            <ProductCard
+                                key={product._id}
+                                product={product}
+                                onClick={() => navigate(`/products/${product.slug}`)}
+                            />
+                        ))}
+                    </div>
+                )}
+
+                {!isLoading && !isError && data?.data?.length === 0 && (
+                    <div style={{ textAlign: 'center', padding: '80px 0' }}>
+                        <p style={{ fontSize: '40px', marginBottom: '16px' }}>📦</p>
+                        <p style={{ color: 'var(--text-secondary)', marginBottom: '20px' }}>No products yet.</p>
+                        <button
+                            onClick={() => navigate('/')}
+                            style={{ padding: '10px 24px', borderRadius: '8px', background: 'var(--accent)', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 500 }}
+                        >
+                            Go home
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     )

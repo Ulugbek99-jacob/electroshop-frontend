@@ -5,11 +5,13 @@ import api from "../api/axios"
 
 const Checkout = () => {
     const [address, setAddress] = useState("")
+    const [loading, setLoading] = useState(false)
     const { items, totalAmount, clearCart } = useCartStore()
     const navigate = useNavigate()
 
     const handleOrder = async (e: React.FormEvent) => {
         e.preventDefault()
+        setLoading(true)
         try {
             await api.post("/orders", {
                 items: items.map(item => ({
@@ -22,30 +24,61 @@ const Checkout = () => {
             })
             clearCart()
             navigate("/orders")
-        } catch (error) {
+        } catch {
             alert("Something went wrong")
+        } finally {
+            setLoading(false)
         }
     }
 
     return (
-        <div className="min-h-screen bg-gray-100">
-            <div className="max-w-2xl mx-auto px-4 py-8">
-                <h1 className="text-3xl font-bold text-gray-800 mb-6">Checkout</h1>
-                <div className="bg-white rounded-lg shadow p-6">
-                    <h3 className="text-xl font-semibold mb-4">Total: {totalAmount()} $</h3>
-                    <form onSubmit={handleOrder} className="flex flex-col gap-4">
-                        <input
-                            type="text"
-                            value={address}
-                            onChange={(e) => setAddress(e.target.value)}
-                            placeholder="Shipping address"
-                            className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-blue-500"
-                        />
+        <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
+            <div style={{ maxWidth: '560px', margin: '0 auto', padding: '48px 24px' }}>
+                <h1 style={{ fontSize: '32px', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: '32px' }}>Checkout</h1>
+
+                <div style={{ background: 'var(--surface)', borderRadius: '20px', border: '1px solid var(--border)', padding: '28px', marginBottom: '20px' }}>
+                    <h2 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '16px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                        Order Summary
+                    </h2>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' }}>
+                        {items.map(item => (
+                            <div key={item.product._id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
+                                <span style={{ color: 'var(--text-secondary)' }}>{item.product.name} × {item.quantity}</span>
+                                <span style={{ fontWeight: 600 }}>${(item.product.price * item.quantity).toLocaleString()}</span>
+                            </div>
+                        ))}
+                    </div>
+                    <div style={{ height: '1px', background: 'var(--border)', marginBottom: '16px' }} />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontWeight: 600 }}>Total</span>
+                        <span style={{ fontSize: '20px', fontWeight: 800 }}>${totalAmount().toLocaleString()}</span>
+                    </div>
+                </div>
+
+                <div style={{ background: 'var(--surface)', borderRadius: '20px', border: '1px solid var(--border)', padding: '28px' }}>
+                    <h2 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '16px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                        Shipping
+                    </h2>
+                    <form onSubmit={handleOrder} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        <div>
+                            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>ADDRESS</label>
+                            <input
+                                type="text"
+                                value={address}
+                                onChange={(e) => setAddress(e.target.value)}
+                                placeholder="123 Main St, Seoul, Korea"
+                                required
+                                style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--bg)', fontSize: '14px', outline: 'none' }}
+                                onFocus={e => e.target.style.borderColor = 'var(--blue)'}
+                                onBlur={e => e.target.style.borderColor = 'var(--border)'}
+                            />
+                        </div>
                         <button
                             type="submit"
-                            className="bg-blue-500 hover:bg-blue-600 text-white py-3 rounded font-semibold"
+                            disabled={loading}
+                            style={{ padding: '13px', borderRadius: '10px', background: 'var(--accent)', color: '#fff', border: 'none', fontSize: '14px', fontWeight: 600, cursor: 'pointer', opacity: loading ? 0.7 : 1 }}
                         >
-                            Place Order
+                            {loading ? 'Placing order...' : 'Place order'}
                         </button>
                     </form>
                 </div>

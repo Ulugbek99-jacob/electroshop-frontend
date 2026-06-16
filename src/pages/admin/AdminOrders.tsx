@@ -1,6 +1,14 @@
 import { useQuery } from "@tanstack/react-query"
 import api from "../../api/axios"
 
+const statusColors: Record<string, string> = {
+    pending: '#CA8A04',
+    confirmed: '#2563EB',
+    shipped: '#7C3AED',
+    delivered: '#16A34A',
+    cancelled: '#DC2626',
+}
+
 const AdminOrders = () => {
     const { data, isLoading, refetch } = useQuery({
         queryKey: ["admin-orders"],
@@ -12,32 +20,59 @@ const AdminOrders = () => {
         refetch()
     }
 
-    if (isLoading) return <p className="text-center mt-10">Loading...</p>
+    if (isLoading) return (
+        <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <p style={{ color: 'var(--text-secondary)' }}>Loading...</p>
+        </div>
+    )
 
     return (
-        <div className="min-h-screen bg-gray-100">
-            <div className="max-w-6xl mx-auto px-4 py-8">
-                <h1 className="text-3xl font-bold text-gray-800 mb-6">Orders</h1>
-                <div className="flex flex-col gap-4">
+        <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
+            <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '48px 24px' }}>
+                <div style={{ marginBottom: '32px' }}>
+                    <p style={{ fontSize: '11px', color: 'var(--text-tertiary)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '4px' }}>Admin</p>
+                    <h1 style={{ fontSize: '28px', fontWeight: 800, letterSpacing: '-0.03em' }}>Orders</h1>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                     {data?.data.map((order: any) => (
-                        <div key={order._id} className="bg-white rounded-lg shadow p-4">
-                            <p className="text-gray-500 text-sm">ID: {order._id}</p>
-                            <p className="text-blue-600 font-bold text-lg">Total: {order.totalAmount} $</p>
-                            <p className="text-gray-700">Address: {order.shippingAddress}</p>
-                            <div className="flex items-center gap-3 mt-3">
-                                <span className="text-gray-700 font-semibold">Status:</span>
-                                <select
-                                    value={order.status}
-                                    onChange={(e) => handleStatusUpdate(order._id, e.target.value)}
-                                    className="border border-gray-300 rounded px-3 py-1 focus:outline-none focus:border-blue-500"
-                                >
-                                    <option value="pending">Pending</option>
-                                    <option value="confirmed">Confirmed</option>
-                                    <option value="shipped">Shipped</option>
-                                    <option value="delivered">Delivered</option>
-                                    <option value="cancelled">Cancelled</option>
-                                </select>
+                        <div key={order._id} style={{
+                            background: 'var(--surface)',
+                            borderRadius: '14px',
+                            border: '1px solid var(--border)',
+                            padding: '18px 24px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '20px',
+                        }}>
+                            <div style={{ flex: 1 }}>
+                                <p style={{ fontSize: '11px', color: 'var(--text-tertiary)', fontFamily: 'monospace', marginBottom: '4px' }}>
+                                    #{order._id.slice(-8).toUpperCase()}
+                                </p>
+                                <p style={{ fontSize: '15px', fontWeight: 700 }}>${order.totalAmount?.toLocaleString()}</p>
+                                <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }}>{order.shippingAddress}</p>
                             </div>
+
+                            <select
+                                value={order.status}
+                                onChange={(e) => handleStatusUpdate(order._id, e.target.value)}
+                                style={{
+                                    padding: '7px 12px',
+                                    borderRadius: '8px',
+                                    border: '1px solid var(--border)',
+                                    background: `${statusColors[order.status]}18`,
+                                    color: statusColors[order.status],
+                                    fontSize: '12px',
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                    outline: 'none',
+                                    textTransform: 'capitalize',
+                                }}
+                            >
+                                {['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'].map(s => (
+                                    <option key={s} value={s} style={{ background: '#fff', color: '#000' }}>{s}</option>
+                                ))}
+                            </select>
                         </div>
                     ))}
                 </div>

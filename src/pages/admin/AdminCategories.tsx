@@ -22,9 +22,7 @@ const AdminCategories = () => {
         setUploading(true)
         const formData = new FormData()
         formData.append("image", file)
-        const response = await api.post("/uploads", formData, {
-            headers: { "Content-Type": "multipart/form-data" }
-        })
+        const response = await api.post("/uploads", formData, { headers: { "Content-Type": "multipart/form-data" } })
         setImageUrl(response.data.url)
         setUploading(false)
     }
@@ -36,56 +34,97 @@ const AdminCategories = () => {
             refetch()
             setForm({ name: "", slug: "", description: "" })
             setImageUrl("")
-        } catch (error) {
+        } catch {
             alert("Error occurred")
         }
     }
 
     const handleDelete = async (id: string) => {
-        if (confirm("Are you sure?")) {
+        if (confirm("Delete this category?")) {
             await api.delete(`/category/${id}`)
             refetch()
         }
     }
 
-    if (isLoading) return <p className="text-center mt-10">Loading...</p>
+    const inputStyle: React.CSSProperties = {
+        width: '100%',
+        padding: '10px 14px',
+        borderRadius: '8px',
+        border: '1px solid var(--border)',
+        background: 'var(--bg)',
+        fontSize: '14px',
+        color: 'var(--text-primary)',
+        outline: 'none',
+        fontFamily: 'Inter, sans-serif',
+    }
+
+    if (isLoading) return (
+        <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <p style={{ color: 'var(--text-secondary)' }}>Loading...</p>
+        </div>
+    )
 
     return (
-        <div className="min-h-screen bg-gray-100">
-            <div className="max-w-4xl mx-auto px-4 py-8">
-                <h1 className="text-3xl font-bold text-gray-800 mb-6">Categories</h1>
-                <div className="bg-white rounded-lg shadow p-6 mb-6">
-                    <h2 className="text-xl font-semibold mb-4">Add Category</h2>
-                    <form onSubmit={handleCreate} className="flex flex-col gap-4">
-                        <input name="name" value={form.name} placeholder="Name" onChange={handleChange}
-                            className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-blue-500" />
-                        <input name="slug" value={form.slug} placeholder="Slug" onChange={handleChange}
-                            className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-blue-500" />
-                        <input name="description" value={form.description} placeholder="Description" onChange={handleChange}
-                            className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:border-blue-500" />
-                        <input type="file" accept="image/*" onChange={handleImageUpload}
-                            className="border border-gray-300 rounded px-4 py-2" />
-                        {uploading && <p className="text-blue-500">Uploading...</p>}
-                        {imageUrl !== "" && <img src={imageUrl} alt="preview" className="w-32 h-32 object-cover rounded" />}
-                        <button type="submit"
-                            className="bg-blue-500 hover:bg-blue-600 text-white py-2 rounded font-semibold">
-                            Create
+        <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
+            <div style={{ maxWidth: '800px', margin: '0 auto', padding: '48px 24px' }}>
+                <div style={{ marginBottom: '32px' }}>
+                    <p style={{ fontSize: '11px', color: 'var(--text-tertiary)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '4px' }}>Admin</p>
+                    <h1 style={{ fontSize: '28px', fontWeight: 800, letterSpacing: '-0.03em' }}>Categories</h1>
+                </div>
+
+                {/* Add form */}
+                <div style={{ background: 'var(--surface)', borderRadius: '20px', border: '1px solid var(--border)', padding: '28px', marginBottom: '24px' }}>
+                    <h2 style={{ fontSize: '15px', fontWeight: 700, marginBottom: '20px' }}>Add Category</h2>
+                    <form onSubmit={handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        {[
+                            { name: 'name', placeholder: 'Smartphones' },
+                            { name: 'slug', placeholder: 'smartphones' },
+                            { name: 'description', placeholder: 'Description (optional)' },
+                        ].map(field => (
+                            <input
+                                key={field.name}
+                                name={field.name}
+                                value={(form as any)[field.name]}
+                                placeholder={field.placeholder}
+                                onChange={handleChange}
+                                style={inputStyle}
+                                onFocus={e => e.target.style.borderColor = 'var(--blue)'}
+                                onBlur={e => e.target.style.borderColor = 'var(--border)'}
+                            />
+                        ))}
+                        <input type="file" accept="image/*" onChange={handleImageUpload} style={{ ...inputStyle, cursor: 'pointer' }} />
+                        {uploading && <p style={{ fontSize: '12px', color: 'var(--blue)' }}>Uploading...</p>}
+                        {imageUrl && <img src={imageUrl} alt="preview" style={{ width: '64px', height: '64px', objectFit: 'cover', borderRadius: '10px', border: '1px solid var(--border)' }} />}
+                        <button type="submit" style={{ padding: '11px', borderRadius: '10px', background: 'var(--accent)', color: '#fff', border: 'none', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>
+                            Create category
                         </button>
                     </form>
                 </div>
-                <div className="flex flex-col gap-4">
+
+                {/* List */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                     {data?.data.map((category: any) => (
-                        <div key={category._id} className="bg-white rounded-lg shadow p-4 flex justify-between items-center">
-                            <div className="flex items-center gap-4">
-                                {category.image && <img src={category.image} alt={category.name} className="w-16 h-16 object-cover rounded" />}
-                                <div>
-                                    <h3 className="font-semibold text-gray-800">{category.name}</h3>
-                                    <p className="text-gray-500 text-sm">{category.slug}</p>
-                                </div>
+                        <div key={category._id} style={{
+                            background: 'var(--surface)',
+                            borderRadius: '14px',
+                            border: '1px solid var(--border)',
+                            padding: '14px 20px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '14px',
+                        }}>
+                            {category.image ? (
+                                <img src={category.image} alt={category.name} style={{ width: '44px', height: '44px', objectFit: 'cover', borderRadius: '10px', border: '1px solid var(--border)' }} />
+                            ) : (
+                                <div style={{ width: '44px', height: '44px', borderRadius: '10px', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>🗂️</div>
+                            )}
+                            <div style={{ flex: 1 }}>
+                                <p style={{ fontSize: '14px', fontWeight: 600 }}>{category.name}</p>
+                                <p style={{ fontSize: '12px', color: 'var(--text-tertiary)', fontFamily: 'monospace' }}>{category.slug}</p>
                             </div>
                             <button
                                 onClick={() => handleDelete(category._id)}
-                                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+                                style={{ padding: '6px 14px', borderRadius: '8px', background: '#FEF2F2', border: '1px solid #FECACA', fontSize: '12px', fontWeight: 600, cursor: 'pointer', color: 'var(--red)' }}
                             >
                                 Delete
                             </button>
