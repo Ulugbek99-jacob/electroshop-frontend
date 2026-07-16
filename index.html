@@ -2,9 +2,37 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>electroshop-frontend</title>
+    <title>ElectroShop — Premium Electronics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      :root {
+        --bg: #FAFAF8;
+        --surface: #FFFFFF;
+        --border: #EBEBEB;
+        --text-primary: #111111;
+        --text-secondary: #6B6B6B;
+        --text-tertiary: #AAAAAA;
+        --accent: #FF5C00;
+        --accent-light: #FFF3ED;
+        --accent-border: #FFD4B8;
+        --blue: #FF5C00;
+        --blue-light: #FFF3ED;
+        --green: #16A34A;
+        --red: #DC2626;
+      }
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        background: var(--bg);
+        color: var(--text-primary);
+        -webkit-font-smoothing: antialiased;
+      }
+      button { font-family: inherit; }
+      input, select, textarea { font-family: inherit; }
+    </style>
   </head>
   <body>
     <div id="root"></div>
